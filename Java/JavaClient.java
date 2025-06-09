@@ -2,8 +2,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class JavaClient {
+
+    private static final Logger logger = Logger.getLogger(JavaClient.class.getName());
+
     public static void main(String[] args) {
         try {
             String json = """
@@ -21,28 +26,28 @@ public class JavaClient {
 
             HttpClient client = HttpClient.newHttpClient();
 
-            // HTTP POST request
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(apiUrl))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
+            logger.info("Sending POST request to " + apiUrl);
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            System.out.println("Status Code: " + response.statusCode());
-            System.out.println("Response Body: " + response.body());
+            logger.info("Status Code: " + response.statusCode());
+            logger.info("Response Body: " + response.body());
 
-            Thread.sleep(10000); // wait for 10 secs before sending data S
+            Thread.sleep(10000); // wait for 10 secs before sending data
 
             if (response.statusCode() == 200) {
-                System.out.println("Success! Server responded with 200 OK.");
+                logger.info("Success! Server responded with 200 OK.");
             } else {
-                System.out.println("Server returned error code.");
+                logger.warning("Server returned error code: " + response.statusCode());
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Exception occurred: ", e);
         }
     }
 }
